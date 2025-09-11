@@ -12,7 +12,7 @@ interface AnalysisResultProps {
 export const AnalysisResult = ({ data }: AnalysisResultProps) => {
   return (
     <div className="space-y-6">
-      {/* 论点提取 */}
+      {/* Core Argument Extraction */}
       <Card className="shadow-elegant">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -35,7 +35,7 @@ export const AnalysisResult = ({ data }: AnalysisResultProps) => {
         </CardContent>
       </Card>
 
-      {/* 逻辑谬误识别 */}
+      {/* Logical Fallacy Detection */}
       {data.fallacies.length > 0 ? (
         <Card className="shadow-elegant border-warning/20">
           <CardHeader>
@@ -65,10 +65,10 @@ export const AnalysisResult = ({ data }: AnalysisResultProps) => {
         </Card>
       )}
 
-      {/* 反驳策略 */}
+      {/* Rebuttal Strategy */}
       <RebuttalStrategy strategies={data.rebuttalStrategies} />
 
-      {/* 总体分析 */}
+      {/* Overall Analysis */}
       <Card className="shadow-elegant">
         <CardHeader>
           <CardTitle>Overall Analysis & Recommendations</CardTitle>

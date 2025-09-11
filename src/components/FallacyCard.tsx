@@ -32,11 +32,11 @@ const getSeverityColor = (severity: "high" | "medium" | "low") => {
 const getSeverityLabel = (severity: "high" | "medium" | "low") => {
   switch (severity) {
     case "high":
-      return "严重";
+      return "Severe";
     case "medium":
-      return "中等";
+      return "Medium";
     case "low":
-      return "轻微";
+      return "Mild";
   }
 };
 
@@ -60,7 +60,7 @@ export const FallacyCard = ({ fallacy }: FallacyCardProps) => {
         </CardDescription>
         
         <div className="p-3 rounded-lg bg-muted/50 border-l-2 border-accent">
-          <p className="text-sm font-medium mb-1">典型表现：</p>
+          <p className="text-sm font-medium mb-1">Typical Example:</p>
           <p className="text-sm text-muted-foreground italic">"{fallacy.example}"</p>
         </div>
       </CardContent>
