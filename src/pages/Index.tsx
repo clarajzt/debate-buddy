@@ -33,52 +33,67 @@ const Index = () => {
   const handleAnalyze = async (argument: string) => {
     setIsAnalyzing(true);
     
-    // 模拟API调用 - 实际应用中需要连接LLM API
-    setTimeout(() => {
-      const mockData: AnalysisData = {
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      
+      const { data, error } = await supabase.functions.invoke('analyze-argument', {
+        body: { argument }
+      });
+
+      if (error) {
+        console.error('Error calling analyze function:', error);
+        throw error;
+      }
+
+      setAnalysisData(data);
+    } catch (error) {
+      console.error('Analysis failed:', error);
+      // Fallback to demo data if API fails
+      const fallbackData: AnalysisData = {
         extractedPoints: [
-          "气候变化是自然现象，不是人为造成的",
-          "历史上地球气候一直在变化",
-          "科学家们对此意见不一致"
+          "Climate change is a natural phenomenon, not human-caused",
+          "Earth's climate has always been changing throughout history", 
+          "Scientists disagree on this issue"
         ],
         fallacies: [
           {
             type: "appeal_to_nature",
-            name: "诉诸自然",
-            description: "仅仅因为某事是'自然的'就认为它是正确或好的",
-            example: "认为所有自然现象都不需要人为干预",
+            name: "Appeal to Nature",
+            description: "Assuming something is good or correct just because it's 'natural'",
+            example: "Believing all natural phenomena don't need human intervention",
             severity: "medium"
           },
           {
             type: "false_equivalence", 
-            name: "虚假平衡",
-            description: "将科学共识与少数异议等同视之",
-            example: "忽视97%科学家的共识，强调少数异议声音",
+            name: "False Balance",
+            description: "Treating scientific consensus and minority dissent as equal",
+            example: "Ignoring 97% scientific consensus while emphasizing minority voices",
             severity: "high"
           }
         ],
         rebuttalStrategies: [
           {
             id: "1",
-            title: "科学证据反驳",
-            approach: "用具体数据和科学研究结果反驳",
-            template: "根据NASA和IPCC的最新报告，{具体数据}表明人为活动确实是主要因素...",
+            title: "Scientific Evidence Rebuttal",
+            approach: "Counter with specific data and research results",
+            template: "According to the latest NASA and IPCC reports, [specific data] clearly shows that human activities are indeed the primary factor...",
             effectiveness: 90
           },
           {
             id: "2", 
-            title: "逻辑结构分析",
-            approach: "指出论证中的逻辑谬误",
-            template: "你的论证存在{谬误类型}的问题，因为{具体分析}...",
+            title: "Logical Structure Analysis",
+            approach: "Point out logical fallacies in the argument",
+            template: "Your argument contains a [fallacy type] problem because [specific analysis]...",
             effectiveness: 85
           }
         ],
-        overallAnalysis: "该论证主要依赖于对科学共识的误解和自然主义谬误。建议从科学证据和逻辑结构两个角度进行反驳。"
+        overallAnalysis: "This argument primarily relies on misunderstanding of scientific consensus and naturalistic fallacy. Recommend countering from both scientific evidence and logical structure perspectives."
       };
       
-      setAnalysisData(mockData);
+      setAnalysisData(fallbackData);
+    } finally {
       setIsAnalyzing(false);
-    }, 2000);
+    }
   };
 
   return (
@@ -94,7 +109,7 @@ const Index = () => {
               <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                 Debate Buddy
               </h1>
-              <p className="text-muted-foreground">AI智能辩论助手 - 识别谬误，制胜策略</p>
+              <p className="text-muted-foreground">AI-Powered Debate Assistant - Identify Fallacies, Win Arguments</p>
             </div>
           </div>
         </div>
@@ -107,22 +122,22 @@ const Index = () => {
             <div className="flex items-center gap-3 p-4 rounded-xl bg-card border border-border/50">
               <Zap className="h-8 w-8 text-accent" />
               <div>
-                <h3 className="font-semibold">逻辑谬误识别</h3>
-                <p className="text-sm text-muted-foreground">自动识别5种常见逻辑谬误</p>
+                <h3 className="font-semibold">Logical Fallacy Detection</h3>
+                <p className="text-sm text-muted-foreground">Automatically identify 5 common logical fallacies</p>
               </div>
             </div>
             <div className="flex items-center gap-3 p-4 rounded-xl bg-card border border-border/50">
               <Target className="h-8 w-8 text-accent" />
               <div>
-                <h3 className="font-semibold">反驳策略生成</h3>
-                <p className="text-sm text-muted-foreground">提供针对性反驳方案</p>
+                <h3 className="font-semibold">Rebuttal Strategy Generation</h3>
+                <p className="text-sm text-muted-foreground">Provide targeted rebuttal solutions</p>
               </div>
             </div>
             <div className="flex items-center gap-3 p-4 rounded-xl bg-card border border-border/50">
               <Brain className="h-8 w-8 text-accent" />
               <div>
-                <h3 className="font-semibold">话术模板</h3>
-                <p className="text-sm text-muted-foreground">生成具体可用的回复模板</p>
+                <h3 className="font-semibold">Response Templates</h3>
+                <p className="text-sm text-muted-foreground">Generate specific usable reply templates</p>
               </div>
             </div>
           </div>

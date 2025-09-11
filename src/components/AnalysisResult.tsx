@@ -17,9 +17,9 @@ export const AnalysisResult = ({ data }: AnalysisResultProps) => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5 text-accent" />
-            核心论点提取
+            Core Argument Extraction
           </CardTitle>
-          <CardDescription>从输入内容中识别出的关键观点</CardDescription>
+          <CardDescription>Key points identified from the input content</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -41,9 +41,9 @@ export const AnalysisResult = ({ data }: AnalysisResultProps) => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-warning" />
-              发现逻辑谬误 ({data.fallacies.length})
+              Logical Fallacies Found ({data.fallacies.length})
             </CardTitle>
-            <CardDescription>在论证中识别出的逻辑问题</CardDescription>
+            <CardDescription>Logical issues identified in the argument</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 md:grid-cols-2">
@@ -58,9 +58,9 @@ export const AnalysisResult = ({ data }: AnalysisResultProps) => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <CheckCircle className="h-5 w-5 text-success" />
-              未发现明显逻辑谬误
+              No Obvious Logical Fallacies Found
             </CardTitle>
-            <CardDescription>该论证在逻辑结构上相对完整</CardDescription>
+            <CardDescription>The argument is relatively complete in its logical structure</CardDescription>
           </CardHeader>
         </Card>
       )}
@@ -71,7 +71,7 @@ export const AnalysisResult = ({ data }: AnalysisResultProps) => {
       {/* 总体分析 */}
       <Card className="shadow-elegant">
         <CardHeader>
-          <CardTitle>总体分析建议</CardTitle>
+          <CardTitle>Overall Analysis & Recommendations</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground leading-relaxed">{data.overallAnalysis}</p>

@@ -20,14 +20,14 @@ export const RebuttalStrategy = ({ strategies }: RebuttalStrategyProps) => {
       await navigator.clipboard.writeText(text);
       setCopiedId(id);
       toast({
-        title: "已复制到剪贴板",
-        description: "反驳话术已复制，可以直接使用",
+        title: "Copied to clipboard",
+        description: "Rebuttal template copied and ready to use",
       });
       setTimeout(() => setCopiedId(null), 2000);
     } catch (err) {
       toast({
-        title: "复制失败",
-        description: "请手动选择并复制内容",
+        title: "Copy failed",
+        description: "Please manually select and copy the content",
         variant: "destructive",
       });
     }
@@ -44,10 +44,10 @@ export const RebuttalStrategy = ({ strategies }: RebuttalStrategyProps) => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Target className="h-5 w-5 text-success" />
-          反驳策略方案
+          Rebuttal Strategy Plans
         </CardTitle>
         <CardDescription>
-          基于分析结果为您推荐的反驳策略和话术模板
+          Recommended rebuttal strategies and response templates based on analysis results
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -55,7 +55,7 @@ export const RebuttalStrategy = ({ strategies }: RebuttalStrategyProps) => {
           <TabsList className="grid w-full grid-cols-2">
             {strategies.map((_, index) => (
               <TabsTrigger key={index} value={index.toString()}>
-                策略 {index + 1}
+                Strategy {index + 1}
               </TabsTrigger>
             ))}
           </TabsList>
@@ -72,7 +72,7 @@ export const RebuttalStrategy = ({ strategies }: RebuttalStrategyProps) => {
                 </div>
                 <div className="text-right">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground">有效性</span>
+                    <span className="text-xs text-muted-foreground">Effectiveness</span>
                     <Badge 
                       variant="outline" 
                       className={`${getEffectivenessColor(strategy.effectiveness)} border-current`}
@@ -87,7 +87,7 @@ export const RebuttalStrategy = ({ strategies }: RebuttalStrategyProps) => {
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base flex items-center gap-2">
                     <MessageSquare className="h-4 w-4 text-primary" />
-                    反驳话术模板
+                    Rebuttal Response Template
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -104,12 +104,12 @@ export const RebuttalStrategy = ({ strategies }: RebuttalStrategyProps) => {
                     {copiedId === strategy.id ? (
                       <>
                         <CheckCircle className="h-4 w-4 mr-2 text-success" />
-                        已复制
+                        Copied
                       </>
                     ) : (
                       <>
                         <Copy className="h-4 w-4 mr-2" />
-                        复制话术模板
+                        Copy Response Template
                       </>
                     )}
                   </Button>

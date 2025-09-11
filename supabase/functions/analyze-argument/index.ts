@@ -1,0 +1,181 @@
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+
+const qwenApiKey = Deno.env.get('QWEN_API_KEY');
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+interface FallacyType {
+  type: string;
+  name: string;
+  description: string;
+  example: string;
+  severity: "high" | "medium" | "low";
+}
+
+interface RebuttalStrategy {
+  id: string;
+  title: string;
+  approach: string;
+  template: string;
+  effectiveness: number;
+}
+
+interface AnalysisData {
+  extractedPoints: string[];
+  fallacies: FallacyType[];
+  rebuttalStrategies: RebuttalStrategy[];
+  overallAnalysis: string;
+}
+
+serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const { argument } = await req.json();
+
+    if (!argument) {
+      return new Response(
+        JSON.stringify({ error: 'Argument text is required' }),
+        { 
+          status: 400, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+
+    const prompt = `Analyze the following argument for logical fallacies and provide rebuttal strategies. 
+
+Argument: "${argument}"
+
+Please provide a comprehensive analysis in the following JSON format:
+{
+  "extractedPoints": ["point1", "point2", "point3"],
+  "fallacies": [
+    {
+      "type": "fallacy_type_key",
+      "name": "Fallacy Name",
+      "description": "Description of the fallacy",
+      "example": "How this fallacy appears in the argument",
+      "severity": "high|medium|low"
+    }
+  ],
+  "rebuttalStrategies": [
+    {
+      "id": "1",
+      "title": "Strategy Title",
+      "approach": "Brief description of approach",
+      "template": "Specific rebuttal template that can be used",
+      "effectiveness": 85
+    }
+  ],
+  "overallAnalysis": "Overall analysis and recommendations"
+}
+
+Focus on identifying these common fallacies:
+1. Straw Man - Misrepresenting opponent's position
+2. Slippery Slope - Assuming one thing leads to extreme consequences
+3. Ad Hominem - Attacking the person instead of the argument
+4. False Dichotomy - Presenting only two options when more exist
+5. Appeal to Authority - Using irrelevant authority as evidence
+
+Provide 2-3 rebuttal strategies with specific, usable templates. Make the analysis thorough but practical.`;
+
+    const response = await fetch('https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${qwenApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'qwen-turbo',
+        input: {
+          messages: [
+            {
+              role: 'system',
+              content: 'You are an expert in logical reasoning and debate analysis. Provide detailed, accurate analysis of arguments and practical rebuttal strategies. Always respond with valid JSON.'
+            },
+            {
+              role: 'user',
+              content: prompt
+            }
+          ]
+        },
+        parameters: {
+          result_format: 'message'
+        }
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Qwen API error:', errorText);
+      throw new Error(`Qwen API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('Qwen API response:', data);
+
+    let analysisResult: AnalysisData;
+    
+    try {
+      const content = data.output?.choices?.[0]?.message?.content || data.output?.text;
+      if (!content) {
+        throw new Error('No content in response');
+      }
+      
+      // Try to extract JSON from the response
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        analysisResult = JSON.parse(jsonMatch[0]);
+      } else {
+        throw new Error('No JSON found in response');
+      }
+    } catch (parseError) {
+      console.error('Failed to parse Qwen response:', parseError);
+      
+      // Fallback to a structured response if parsing fails
+      analysisResult = {
+        extractedPoints: [
+          "Unable to parse argument automatically",
+          "Please try rephrasing your argument",
+          "Manual analysis may be required"
+        ],
+        fallacies: [],
+        rebuttalStrategies: [
+          {
+            id: "1",
+            title: "Request Clarification",
+            approach: "Ask for more specific information",
+            template: "Could you please clarify what you mean by [specific point]? I want to make sure I understand your argument correctly.",
+            effectiveness: 70
+          }
+        ],
+        overallAnalysis: "The argument structure was not clear enough for automated analysis. Consider breaking it down into more specific points."
+      };
+    }
+
+    return new Response(JSON.stringify(analysisResult), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+
+  } catch (error) {
+    console.error('Error in analyze-argument function:', error);
+    return new Response(
+      JSON.stringify({ 
+        error: 'Analysis failed',
+        message: error.message 
+      }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    );
+  }
+});

@@ -23,15 +23,15 @@ export const ArgumentInput = ({ onAnalyze, isAnalyzing }: ArgumentInputProps) =>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Send className="h-5 w-5 text-primary" />
-          输入对方论点
+          Enter Opponent's Argument
         </CardTitle>
         <CardDescription>
-          请输入您想要分析的争论内容或对方的核心论点，我们将帮您识别其中的逻辑问题并提供反驳策略。
+          Enter the argument content or opponent's core points you want to analyze. We'll help identify logical issues and provide rebuttal strategies.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <Textarea
-          placeholder="例如：'气候变化是自然现象，不是人为造成的。历史上地球气候一直在变化，而且科学家们对此意见也不一致，所以我们不需要为此担心。'"
+          placeholder="Example: 'Climate change is a natural phenomenon, not caused by humans. Earth's climate has always been changing throughout history, and scientists disagree on this, so we don't need to worry about it.'"
           value={argument}
           onChange={(e) => setArgument(e.target.value)}
           className="min-h-[120px] resize-none"
@@ -40,7 +40,7 @@ export const ArgumentInput = ({ onAnalyze, isAnalyzing }: ArgumentInputProps) =>
         
         <div className="flex justify-between items-center">
           <span className="text-sm text-muted-foreground">
-            {argument.length}/1000 字符
+            {argument.length}/1000 characters
           </span>
           
           <Button 
@@ -51,12 +51,12 @@ export const ArgumentInput = ({ onAnalyze, isAnalyzing }: ArgumentInputProps) =>
             {isAnalyzing ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                分析中...
+                Analyzing...
               </>
             ) : (
               <>
                 <Send className="h-4 w-4 mr-2" />
-                开始分析
+                Start Analysis
               </>
             )}
           </Button>
