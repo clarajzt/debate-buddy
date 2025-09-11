@@ -40,7 +40,7 @@ export const ArgumentInput = ({ onAnalyze, isAnalyzing }: ArgumentInputProps) =>
         
         <div className="flex justify-between items-center">
           <span className="text-sm text-muted-foreground">
-            {argument.length}/1000 characters
+            {argument.length}/5000 characters
           </span>
           
           <Button 
