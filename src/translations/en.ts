@@ -23,6 +23,17 @@ export const en = {
     overallAnalysis: "Overall Analysis & Recommendations",
     typicalExample: "Typical Example"
   },
+  analysis: {
+    extractedPoints: "Core Points",
+    fallaciesDetected: "Logical Fallacies",
+    noFallacies: "No fallacies detected - argument appears logically sound",
+    rebuttalStrategies: "Rebuttal Strategies"
+  },
+  severity: {
+    high: "High",
+    medium: "Medium",
+    low: "Low"
+  },
   fallacy: {
     severity: {
       high: "Severe",

@@ -23,6 +23,17 @@ export const zh = {
     overallAnalysis: "总体分析与建议",
     typicalExample: "典型表现"
   },
+  analysis: {
+    extractedPoints: "核心要点",
+    fallaciesDetected: "逻辑谬误",
+    noFallacies: "未检测到谬误 - 论证在逻辑上合理",
+    rebuttalStrategies: "反驳策略"
+  },
+  severity: {
+    high: "高",
+    medium: "中",
+    low: "低"
+  },
   fallacy: {
     severity: {
       high: "严重",

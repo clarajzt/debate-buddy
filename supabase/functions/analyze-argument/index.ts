@@ -38,7 +38,7 @@ serve(async (req) => {
   }
 
   try {
-    const { argument } = await req.json();
+    const { argument, conversationHistory = [] } = await req.json();
 
     if (!argument) {
       return new Response(
@@ -50,11 +50,29 @@ serve(async (req) => {
       );
     }
 
-    const prompt = `Analyze the following argument for logical fallacies and provide rebuttal strategies. 
+    let prompt = '';
+    
+    if (conversationHistory.length > 1) {
+      // Ongoing conversation - provide contextual analysis
+      prompt = `You are analyzing an ongoing debate conversation. Here is the conversation history:
+
+${conversationHistory.slice(0, -1).map((msg: any, idx: number) => 
+  `${idx + 1}. ${msg.role === 'user' ? 'User' : 'Analysis'}: ${msg.content}`
+).join('\n')}
+
+Latest argument to analyze: "${argument}"
+
+Analyze this latest argument in the context of the ongoing conversation. Provide analysis in the following JSON format:`;
+    } else {
+      // First message - standard analysis
+      prompt = `Analyze the following argument for logical fallacies and provide rebuttal strategies. 
 
 Argument: "${argument}"
 
-Please provide a comprehensive analysis in the following JSON format:
+Please provide a comprehensive analysis in the following JSON format:`;
+    }
+    
+    prompt += `
 {
   "extractedPoints": ["point1", "point2", "point3"],
   "fallacies": [
@@ -87,6 +105,29 @@ Focus on identifying these common fallacies:
 
 Provide 2-3 rebuttal strategies with specific, usable templates. Make the analysis thorough but practical.`;
 
+    // Build message history for the AI
+    const messages = [
+      {
+        role: 'system',
+        content: 'You are an expert in logical reasoning and debate analysis. Provide detailed, accurate analysis of arguments and practical rebuttal strategies in the context of ongoing conversations. Always respond with valid JSON.'
+      }
+    ];
+
+    // Add conversation context if it exists
+    if (conversationHistory.length > 1) {
+      conversationHistory.slice(0, -1).forEach((msg: any) => {
+        messages.push({
+          role: msg.role === 'user' ? 'user' : 'assistant',
+          content: msg.content
+        });
+      });
+    }
+
+    messages.push({
+      role: 'user',
+      content: prompt
+    });
+
     const response = await fetch('https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation', {
       method: 'POST',
       headers: {
@@ -96,16 +137,7 @@ Provide 2-3 rebuttal strategies with specific, usable templates. Make the analys
       body: JSON.stringify({
         model: 'qwen-turbo',
         input: {
-          messages: [
-            {
-              role: 'system',
-              content: 'You are an expert in logical reasoning and debate analysis. Provide detailed, accurate analysis of arguments and practical rebuttal strategies. Always respond with valid JSON.'
-            },
-            {
-              role: 'user',
-              content: prompt
-            }
-          ]
+          messages: messages
         },
         parameters: {
           result_format: 'message'

@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { ArgumentInput } from "@/components/ArgumentInput";
-import { AnalysisResult } from "@/components/AnalysisResult";
+import { ChatMessage } from "@/components/ChatMessage";
 import { LanguageSelector } from "@/components/LanguageSelector";
-import { Brain, Zap, Target } from "lucide-react";
+import { Brain } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/translations";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export interface FallacyType {
   type: string;
@@ -29,20 +30,49 @@ export interface AnalysisData {
   overallAnalysis: string;
 }
 
+interface Message {
+  role: "user" | "assistant";
+  content: string;
+  analysis?: AnalysisData;
+}
+
 const Index = () => {
   const { language } = useLanguage();
   const t = translations[language];
-  const [analysisData, setAnalysisData] = useState<AnalysisData | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   const handleAnalyze = async (argument: string) => {
     setIsAnalyzing(true);
     
+    // Add user message
+    const userMessage: Message = {
+      role: "user",
+      content: argument
+    };
+    setMessages(prev => [...prev, userMessage]);
+    
     try {
       const { supabase } = await import("@/integrations/supabase/client");
       
+      // Send conversation history
+      const conversationHistory = [...messages, userMessage].map(msg => ({
+        role: msg.role,
+        content: msg.content
+      }));
+      
       const { data, error } = await supabase.functions.invoke('analyze-argument', {
-        body: { argument }
+        body: { 
+          argument,
+          conversationHistory 
+        }
       });
 
       if (error) {
@@ -50,52 +80,40 @@ const Index = () => {
         throw error;
       }
 
-      setAnalysisData(data);
+      // Add assistant message with analysis
+      const assistantMessage: Message = {
+        role: "assistant",
+        content: data.overallAnalysis || "Analysis complete",
+        analysis: data
+      };
+      setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
       console.error('Analysis failed:', error);
-      // Fallback to demo data if API fails
+      // Fallback response
       const fallbackData: AnalysisData = {
         extractedPoints: [
-          "Climate change is a natural phenomenon, not human-caused",
-          "Earth's climate has always been changing throughout history", 
-          "Scientists disagree on this issue"
+          "Unable to analyze at the moment",
+          "Please try again"
         ],
-        fallacies: [
-          {
-            type: "appeal_to_nature",
-            name: "Appeal to Nature",
-            description: "Assuming something is good or correct just because it's 'natural'",
-            example: "Believing all natural phenomena don't need human intervention",
-            severity: "medium"
-          },
-          {
-            type: "false_equivalence", 
-            name: "False Balance",
-            description: "Treating scientific consensus and minority dissent as equal",
-            example: "Ignoring 97% scientific consensus while emphasizing minority voices",
-            severity: "high"
-          }
-        ],
+        fallacies: [],
         rebuttalStrategies: [
           {
             id: "1",
-            title: "Scientific Evidence Rebuttal",
-            approach: "Counter with specific data and research results",
-            template: "According to the latest NASA and IPCC reports, [specific data] clearly shows that human activities are indeed the primary factor...",
-            effectiveness: 90
-          },
-          {
-            id: "2", 
-            title: "Logical Structure Analysis",
-            approach: "Point out logical fallacies in the argument",
-            template: "Your argument contains a [fallacy type] problem because [specific analysis]...",
-            effectiveness: 85
+            title: "Request Clarification",
+            approach: "Ask for more specific information",
+            template: "Could you please clarify your point? I want to make sure I understand correctly.",
+            effectiveness: 70
           }
         ],
-        overallAnalysis: "This argument primarily relies on misunderstanding of scientific consensus and naturalistic fallacy. Recommend countering from both scientific evidence and logical structure perspectives."
+        overallAnalysis: "Analysis temporarily unavailable. Please try again."
       };
       
-      setAnalysisData(fallbackData);
+      const assistantMessage: Message = {
+        role: "assistant",
+        content: fallbackData.overallAnalysis,
+        analysis: fallbackData
+      };
+      setMessages(prev => [...prev, assistantMessage]);
     } finally {
       setIsAnalyzing(false);
     }
@@ -124,13 +142,41 @@ const Index = () => {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto space-y-8">
-          <ArgumentInput onAnalyze={handleAnalyze} isAnalyzing={isAnalyzing} />
+      <main className="container mx-auto px-4 py-4 flex flex-col h-[calc(100vh-180px)]">
+        <div className="max-w-4xl mx-auto w-full flex flex-col h-full gap-4">
+          {/* Messages Area */}
+          <ScrollArea className="flex-1 pr-4" ref={scrollRef}>
+            <div className="space-y-4">
+              {messages.length === 0 ? (
+                <div className="text-center text-muted-foreground py-12">
+                  <Brain className="h-12 w-12 mx-auto mb-4 text-primary" />
+                  <p>{t.hero.subtitle}</p>
+                  <p className="text-sm mt-2">{language === 'zh' ? '开始对话以分析论点' : 'Start a conversation to analyze arguments'}</p>
+                </div>
+              ) : (
+                messages.map((message, idx) => (
+                  <ChatMessage
+                    key={idx}
+                    role={message.role}
+                    content={message.content}
+                    analysis={message.analysis}
+                  />
+                ))
+              )}
+              {isAnalyzing && (
+                <div className="flex gap-3">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <div className="animate-pulse">Analyzing...</div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </ScrollArea>
           
-          {analysisData && (
-            <AnalysisResult data={analysisData} />
-          )}
+          {/* Input Area */}
+          <div className="flex-shrink-0">
+            <ArgumentInput onAnalyze={handleAnalyze} isAnalyzing={isAnalyzing} />
+          </div>
         </div>
       </main>
     </div>

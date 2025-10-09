@@ -19,26 +19,24 @@ export const ArgumentInput = ({ onAnalyze, isAnalyzing }: ArgumentInputProps) =>
   const handleSubmit = () => {
     if (argument.trim()) {
       onAnalyze(argument.trim());
+      setArgument("");
     }
   };
 
   return (
     <Card className="w-full shadow-elegant">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Send className="h-5 w-5 text-primary" />
-          {t.input.title}
-        </CardTitle>
-        <CardDescription>
-          {t.input.placeholder}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="p-4 space-y-3">
         <Textarea
           placeholder={t.input.placeholder}
           value={argument}
           onChange={(e) => setArgument(e.target.value)}
-          className="min-h-[120px] resize-none"
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              handleSubmit();
+            }
+          }}
+          className="min-h-[80px] resize-none"
           disabled={isAnalyzing}
         />
         
