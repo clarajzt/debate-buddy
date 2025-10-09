@@ -38,7 +38,7 @@ serve(async (req) => {
   }
 
   try {
-    const { argument, conversationHistory = [] } = await req.json();
+    const { argument, conversationHistory = [], context, userReply } = await req.json();
 
     if (!argument) {
       return new Response(
@@ -52,6 +52,15 @@ serve(async (req) => {
 
     let prompt = '';
     
+    // Add context and user reply information if provided
+    let contextInfo = '';
+    if (context) {
+      contextInfo += `\n\nDEBATE CONTEXT: ${context}`;
+    }
+    if (userReply) {
+      contextInfo += `\n\nUSER'S ACTUAL REPLY: ${userReply}`;
+    }
+    
     if (conversationHistory.length > 1) {
       // Ongoing conversation - provide contextual analysis
       prompt = `You are analyzing an ongoing debate conversation. Here is the conversation history:
@@ -59,13 +68,14 @@ serve(async (req) => {
 ${conversationHistory.slice(0, -1).map((msg: any, idx: number) => 
   `${idx + 1}. ${msg.role === 'user' ? 'User' : 'Analysis'}: ${msg.content}`
 ).join('\n')}
+${contextInfo}
 
 Latest argument to analyze: "${argument}"
 
-Analyze this latest argument in the context of the ongoing conversation. Provide analysis in the following JSON format:`;
+Analyze this latest argument in the context of the ongoing conversation${context ? ' and provided debate context' : ''}${userReply ? '. Also evaluate the effectiveness of the user\'s reply' : ''}. Provide analysis in the following JSON format:`;
     } else {
       // First message - standard analysis
-      prompt = `Analyze the following argument for logical fallacies and provide rebuttal strategies. 
+      prompt = `Analyze the following argument for logical fallacies and provide rebuttal strategies.${contextInfo}
 
 Argument: "${argument}"
 

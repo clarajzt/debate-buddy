@@ -9,7 +9,13 @@ export const en = {
     placeholder: "Paste or type the argument you want to analyze...",
     charLimit: "characters",
     analyzeButton: "Analyze Argument",
-    analyzing: "Analyzing..."
+    analyzing: "Analyzing...",
+    addContext: "Add Context & Your Reply (Optional)",
+    contextLabel: "Debate Context",
+    contextPlaceholder: "Provide background information or context about this debate...",
+    userReplyLabel: "Your Reply/Response",
+    userReplyPlaceholder: "What did you send or plan to send as a reply?",
+    argumentLabel: "Argument to Analyze"
   },
   results: {
     coreArgument: "Core Argument Extraction",

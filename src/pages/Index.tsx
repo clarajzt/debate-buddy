@@ -49,13 +49,20 @@ const Index = () => {
     }
   }, [messages]);
 
-  const handleAnalyze = async (argument: string) => {
+  const handleAnalyze = async (argument: string, context?: string, userReply?: string) => {
     setIsAnalyzing(true);
     
-    // Add user message
+    // Add user message with context if provided
+    let displayContent = argument;
+    if (context || userReply) {
+      displayContent = argument;
+      if (context) displayContent = `[Context: ${context}]\n\n${displayContent}`;
+      if (userReply) displayContent = `${displayContent}\n\n[My Reply: ${userReply}]`;
+    }
+    
     const userMessage: Message = {
       role: "user",
-      content: argument
+      content: displayContent
     };
     setMessages(prev => [...prev, userMessage]);
     
@@ -71,7 +78,9 @@ const Index = () => {
       const { data, error } = await supabase.functions.invoke('analyze-argument', {
         body: { 
           argument,
-          conversationHistory 
+          conversationHistory,
+          context,
+          userReply
         }
       });
 

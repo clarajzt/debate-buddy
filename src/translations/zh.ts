@@ -9,7 +9,13 @@ export const zh = {
     placeholder: "粘贴或输入您想要分析的论证内容...",
     charLimit: "字符",
     analyzeButton: "分析论证",
-    analyzing: "分析中..."
+    analyzing: "分析中...",
+    addContext: "添加背景和您的回复（可选）",
+    contextLabel: "辩论背景",
+    contextPlaceholder: "提供关于此辩论的背景信息或上下文...",
+    userReplyLabel: "您的回复/回应",
+    userReplyPlaceholder: "您发送或计划发送的回复是什么？",
+    argumentLabel: "要分析的论证"
   },
   results: {
     coreArgument: "核心论点提取",
