@@ -50,6 +50,11 @@ serve(async (req) => {
       );
     }
 
+    // Detect language based on the presence of Chinese characters
+    const hasChinese = /[\u4e00-\u9fff]/.test(argument);
+    const language = hasChinese ? 'Chinese' : 'English';
+    const languageInstruction = `CRITICAL: Respond entirely in ${language}. All field names should remain in English for JSON structure, but all content values (extractedPoints, descriptions, examples, templates, overallAnalysis, etc.) must be in ${language}.`;
+
     let prompt = '';
     
     // Add context and user reply information if provided
@@ -106,6 +111,8 @@ Please provide a comprehensive analysis in the following JSON format:`;
   "overallAnalysis": "Overall analysis and recommendations"
 }
 
+${languageInstruction}
+
 Focus on identifying these common fallacies:
 1. Straw Man - Misrepresenting opponent's position
 2. Slippery Slope - Assuming one thing leads to extreme consequences
@@ -119,7 +126,7 @@ Provide 2-3 rebuttal strategies with specific, usable templates. Make the analys
     const messages = [
       {
         role: 'system',
-        content: 'You are an expert in logical reasoning and debate analysis. Provide detailed, accurate analysis of arguments and practical rebuttal strategies in the context of ongoing conversations. Always respond with valid JSON.'
+        content: `You are an expert in logical reasoning and debate analysis. Provide detailed, accurate analysis of arguments and practical rebuttal strategies in the context of ongoing conversations. Always respond with valid JSON. ${languageInstruction}`
       }
     ];
 
