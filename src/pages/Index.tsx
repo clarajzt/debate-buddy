@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { ArgumentInput } from "@/components/ArgumentInput";
 import { AnalysisResult } from "@/components/AnalysisResult";
+import { LanguageSelector } from "@/components/LanguageSelector";
 import { Brain, Zap, Target } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { translations } from "@/translations";
 
 export interface FallacyType {
   type: string;
@@ -27,6 +30,8 @@ export interface AnalysisData {
 }
 
 const Index = () => {
+  const { language } = useLanguage();
+  const t = translations[language];
   const [analysisData, setAnalysisData] = useState<AnalysisData | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
@@ -101,16 +106,19 @@ const Index = () => {
       {/* Header */}
       <header className="border-b border-border/50 bg-card/80 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-accent">
-              <Brain className="h-6 w-6 text-primary-foreground" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-accent">
+                <Brain className="h-6 w-6 text-primary-foreground" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                  {t.hero.title}
+                </h1>
+                <p className="text-muted-foreground">{t.hero.subtitle}</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                Debate Buddy
-              </h1>
-              <p className="text-muted-foreground">AI-Powered Debate Assistant - Identify Fallacies, Win Arguments</p>
-            </div>
+            <LanguageSelector />
           </div>
         </div>
       </header>

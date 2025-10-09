@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Send, Loader2 } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { translations } from "@/translations";
 
 interface ArgumentInputProps {
   onAnalyze: (argument: string) => void;
@@ -10,6 +12,8 @@ interface ArgumentInputProps {
 }
 
 export const ArgumentInput = ({ onAnalyze, isAnalyzing }: ArgumentInputProps) => {
+  const { language } = useLanguage();
+  const t = translations[language];
   const [argument, setArgument] = useState("");
 
   const handleSubmit = () => {
@@ -23,15 +27,15 @@ export const ArgumentInput = ({ onAnalyze, isAnalyzing }: ArgumentInputProps) =>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Send className="h-5 w-5 text-primary" />
-          Enter Opponent's Argument
+          {t.input.title}
         </CardTitle>
         <CardDescription>
-          Enter the argument content or opponent's core points you want to analyze. We'll help identify logical issues and provide rebuttal strategies.
+          {t.input.placeholder}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <Textarea
-          placeholder="Example: 'Climate change is a natural phenomenon, not caused by humans. Earth's climate has always been changing throughout history, and scientists disagree on this, so we don't need to worry about it.'"
+          placeholder={t.input.placeholder}
           value={argument}
           onChange={(e) => setArgument(e.target.value)}
           className="min-h-[120px] resize-none"
@@ -40,7 +44,7 @@ export const ArgumentInput = ({ onAnalyze, isAnalyzing }: ArgumentInputProps) =>
         
         <div className="flex justify-between items-center">
           <span className="text-sm text-muted-foreground">
-            {argument.length}/5000 characters
+            {argument.length}/5000 {t.input.charLimit}
           </span>
           
           <Button 
@@ -51,12 +55,12 @@ export const ArgumentInput = ({ onAnalyze, isAnalyzing }: ArgumentInputProps) =>
             {isAnalyzing ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Analyzing...
+                {t.input.analyzing}
               </>
             ) : (
               <>
                 <Send className="h-4 w-4 mr-2" />
-                Start Analysis
+                {t.input.analyzeButton}
               </>
             )}
           </Button>

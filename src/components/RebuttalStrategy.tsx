@@ -6,12 +6,16 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Copy, CheckCircle, Target, MessageSquare, Lightbulb } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { translations } from "@/translations";
 
 interface RebuttalStrategyProps {
   strategies: Strategy[];
 }
 
 export const RebuttalStrategy = ({ strategies }: RebuttalStrategyProps) => {
+  const { language } = useLanguage();
+  const t = translations[language];
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const { toast } = useToast();
 
@@ -44,10 +48,10 @@ export const RebuttalStrategy = ({ strategies }: RebuttalStrategyProps) => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Target className="h-5 w-5 text-success" />
-          Rebuttal Strategy Plans
+          {t.rebuttal.title}
         </CardTitle>
         <CardDescription>
-          Recommended rebuttal strategies and response templates based on analysis results
+          {t.rebuttal.description}
         </CardDescription>
       </CardHeader>
       <CardContent>

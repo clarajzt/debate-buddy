@@ -2,6 +2,8 @@ import { FallacyType } from "@/pages/Index";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertTriangle, AlertCircle, Info } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { translations } from "@/translations";
 
 interface FallacyCardProps {
   fallacy: FallacyType;
@@ -29,18 +31,10 @@ const getSeverityColor = (severity: "high" | "medium" | "low") => {
   }
 };
 
-const getSeverityLabel = (severity: "high" | "medium" | "low") => {
-  switch (severity) {
-    case "high":
-      return "Severe";
-    case "medium":
-      return "Medium";
-    case "low":
-      return "Mild";
-  }
-};
-
 export const FallacyCard = ({ fallacy }: FallacyCardProps) => {
+  const { language } = useLanguage();
+  const t = translations[language];
+  
   return (
     <Card className="transition-all hover:shadow-lg">
       <CardHeader className="pb-3">
@@ -49,7 +43,7 @@ export const FallacyCard = ({ fallacy }: FallacyCardProps) => {
           <div className="flex items-center gap-2">
             {getSeverityIcon(fallacy.severity)}
             <Badge variant={getSeverityColor(fallacy.severity) as any} className="text-xs">
-              {getSeverityLabel(fallacy.severity)}
+              {t.fallacy.severity[fallacy.severity]}
             </Badge>
           </div>
         </div>
@@ -60,7 +54,7 @@ export const FallacyCard = ({ fallacy }: FallacyCardProps) => {
         </CardDescription>
         
         <div className="p-3 rounded-lg bg-muted/50 border-l-2 border-accent">
-          <p className="text-sm font-medium mb-1">Typical Example:</p>
+          <p className="text-sm font-medium mb-1">{t.results.typicalExample}:</p>
           <p className="text-sm text-muted-foreground italic">"{fallacy.example}"</p>
         </div>
       </CardContent>

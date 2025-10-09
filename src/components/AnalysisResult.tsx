@@ -4,12 +4,17 @@ import { FallacyCard } from "@/components/FallacyCard";
 import { RebuttalStrategy } from "@/components/RebuttalStrategy";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, AlertTriangle, FileText } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { translations } from "@/translations";
 
 interface AnalysisResultProps {
   data: AnalysisData;
 }
 
 export const AnalysisResult = ({ data }: AnalysisResultProps) => {
+  const { language } = useLanguage();
+  const t = translations[language];
+  
   return (
     <div className="space-y-6">
       {/* Core Argument Extraction */}
@@ -17,9 +22,9 @@ export const AnalysisResult = ({ data }: AnalysisResultProps) => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5 text-accent" />
-            Core Argument Extraction
+            {t.results.coreArgument}
           </CardTitle>
-          <CardDescription>Key points identified from the input content</CardDescription>
+          <CardDescription>{t.results.mainClaim}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -41,9 +46,9 @@ export const AnalysisResult = ({ data }: AnalysisResultProps) => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-warning" />
-              Logical Fallacies Found ({data.fallacies.length})
+              {t.results.fallaciesFound} ({data.fallacies.length})
             </CardTitle>
-            <CardDescription>Logical issues identified in the argument</CardDescription>
+            <CardDescription>{t.results.fallacyCount.replace('{{count}}', data.fallacies.length.toString())}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 md:grid-cols-2">
@@ -58,9 +63,9 @@ export const AnalysisResult = ({ data }: AnalysisResultProps) => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <CheckCircle className="h-5 w-5 text-success" />
-              No Obvious Logical Fallacies Found
+              {t.results.noFallacies}
             </CardTitle>
-            <CardDescription>The argument is relatively complete in its logical structure</CardDescription>
+            <CardDescription>{t.results.noFallaciesDesc}</CardDescription>
           </CardHeader>
         </Card>
       )}
@@ -71,7 +76,7 @@ export const AnalysisResult = ({ data }: AnalysisResultProps) => {
       {/* Overall Analysis */}
       <Card className="shadow-elegant">
         <CardHeader>
-          <CardTitle>Overall Analysis & Recommendations</CardTitle>
+          <CardTitle>{t.results.overallAnalysis}</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground leading-relaxed">{data.overallAnalysis}</p>
