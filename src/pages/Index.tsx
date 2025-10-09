@@ -123,35 +123,6 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Features Banner */}
-      <section className="py-8 bg-card/30">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="flex items-center gap-3 p-4 rounded-xl bg-card border border-border/50">
-              <Zap className="h-8 w-8 text-accent" />
-              <div>
-                <h3 className="font-semibold">Logical Fallacy Detection</h3>
-                <p className="text-sm text-muted-foreground">Automatically identify 5 common logical fallacies</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 p-4 rounded-xl bg-card border border-border/50">
-              <Target className="h-8 w-8 text-accent" />
-              <div>
-                <h3 className="font-semibold">Rebuttal Strategy Generation</h3>
-                <p className="text-sm text-muted-foreground">Provide targeted rebuttal solutions</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 p-4 rounded-xl bg-card border border-border/50">
-              <Brain className="h-8 w-8 text-accent" />
-              <div>
-                <h3 className="font-semibold">Response Templates</h3>
-                <p className="text-sm text-muted-foreground">Generate specific usable reply templates</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto space-y-8">
