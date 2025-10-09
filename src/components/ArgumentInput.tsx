@@ -30,7 +30,7 @@ export const ArgumentInput = ({ onAnalyze, isAnalyzing }: ArgumentInputProps) =>
 
   return (
     <Card className="w-full shadow-elegant">
-      <CardContent className="p-4 space-y-3">
+      <CardContent className="p-3 space-y-2">
         {/* Context Section - Collapsible */}
         <Collapsible open={showContext} onOpenChange={setShowContext}>
           <CollapsibleTrigger asChild>
@@ -43,7 +43,7 @@ export const ArgumentInput = ({ onAnalyze, isAnalyzing }: ArgumentInputProps) =>
               {t.input.addContext}
             </Button>
           </CollapsibleTrigger>
-          <CollapsibleContent className="space-y-3 pt-3">
+          <CollapsibleContent className="space-y-2 pt-2">
             <div className="space-y-2">
               <label className="text-sm font-medium flex items-center gap-2">
                 <FileText className="h-3.5 w-3.5" />
@@ -53,7 +53,7 @@ export const ArgumentInput = ({ onAnalyze, isAnalyzing }: ArgumentInputProps) =>
                 placeholder={t.input.contextPlaceholder}
                 value={context}
                 onChange={(e) => setContext(e.target.value)}
-                className="min-h-[60px] resize-none text-sm"
+                className="min-h-[50px] resize-none text-sm"
                 disabled={isAnalyzing}
               />
             </div>
@@ -67,7 +67,7 @@ export const ArgumentInput = ({ onAnalyze, isAnalyzing }: ArgumentInputProps) =>
                 placeholder={t.input.userReplyPlaceholder}
                 value={userReply}
                 onChange={(e) => setUserReply(e.target.value)}
-                className="min-h-[60px] resize-none text-sm"
+                className="min-h-[50px] resize-none text-sm"
                 disabled={isAnalyzing}
               />
             </div>
@@ -87,7 +87,7 @@ export const ArgumentInput = ({ onAnalyze, isAnalyzing }: ArgumentInputProps) =>
                 handleSubmit();
               }
             }}
-            className="min-h-[80px] resize-none"
+            className="min-h-[60px] resize-none"
             disabled={isAnalyzing}
           />
         </div>

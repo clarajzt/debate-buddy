@@ -132,7 +132,7 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary">
       {/* Header */}
       <header className="border-b border-border/50 bg-card/80 backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-6">
+        <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-accent">
@@ -151,8 +151,8 @@ const Index = () => {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-4 flex flex-col h-[calc(100vh-180px)]">
-        <div className="max-w-4xl mx-auto w-full flex flex-col h-full gap-4">
+      <main className="container mx-auto px-4 py-2 flex flex-col h-[calc(100vh-140px)]">
+        <div className="max-w-4xl mx-auto w-full flex flex-col h-full gap-2">
           {/* Messages Area */}
           <ScrollArea className="flex-1 pr-4" ref={scrollRef}>
             <div className="space-y-4">
