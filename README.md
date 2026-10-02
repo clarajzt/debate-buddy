@@ -1,73 +1,49 @@
-# Welcome to your Lovable project
+# Debate Buddy
 
-## Project info
+**Think clearly. Reply better.** A bilingual workspace for examining an argument before responding to it.
 
-**URL**: https://lovable.dev/projects/984776ea-a06e-415b-8a14-2a127f28de54
+![Debate Buddy interface, showing an example argument in the editor](public/preview.png)
 
-## How can I edit this code?
+Debate Buddy separates a claim into core points, flags *possible* reasoning gaps, and suggests editable reply strategies. You can add debate context and your own draft response so the analysis is grounded in the exchange you are actually having. The interface supports English and Chinese; the analysis language follows the argument you submit.
 
-There are several ways of editing your application.
+## What it does
 
-**Use Lovable**
+| Input | Output |
+| --- | --- |
+| An argument, plus optional context and your reply | Core points, possible fallacies, practical rebuttal approaches, and an overall assessment |
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/984776ea-a06e-415b-8a14-2a127f28de54) and start prompting.
+The product is designed as a thinking aid, not an arbiter of who is right. AI can miss context, mislabel a fallacy, or produce a weak reply; check the source material and evidence before using its suggestions.
 
-Changes made via Lovable will be committed automatically to this repo.
+## Try it locally
 
-**Use your preferred IDE**
+Requires Node.js and npm:
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```bash
+git clone https://github.com/clarajzt/debate-buddy.git
+cd debate-buddy
+npm ci
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Open the local URL printed by Vite. The interface and sample-input button work without a backend. Live analysis requires a configured Supabase project with the `analyze-argument` Edge Function deployed and a server-side `QWEN_API_KEY` secret. The browser uses the public `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` values; never put the Qwen key in a `VITE_` variable or frontend file.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## How it works
 
-**Use GitHub Codespaces**
+```text
+Browser (React / TypeScript)
+  → Supabase Edge Function (request validation and prompt construction)
+  → Qwen API (structured analysis)
+  → Browser (core points, possible fallacies, reply strategies)
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+The Edge Function is in [`supabase/functions/analyze-argument`](supabase/functions/analyze-argument/index.ts). The UI is in [`src/pages/Index.tsx`](src/pages/Index.tsx). An unavailable or malformed model response is shown as an error, not as a fabricated analysis; the input remains in the editor for retry.
 
-## What technologies are used for this project?
+## Development checks
 
-This project is built with:
+```bash
+npm run build
+npx tsc --noEmit -p tsconfig.app.json
+npm run lint
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/984776ea-a06e-415b-8a14-2a127f28de54) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+Built with React, Vite, TypeScript, Tailwind CSS, shadcn/ui, Supabase Edge Functions, and Qwen. This is an actively developed prototype, not a validated fact-checking or debate-scoring system.
