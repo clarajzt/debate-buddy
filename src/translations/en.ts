@@ -1,4 +1,26 @@
 export const en = {
+  workspace: {
+    brandTag: "Think clearly. Reply better.",
+    eyebrow: "A calmer way to make your case",
+    headline: "Good arguments start with better questions.",
+    description: "Paste a claim, see the reasoning underneath it, and draft a response that moves the conversation forward.",
+    stepOne: "Find the core claim",
+    stepOneDetail: "Separate what is being argued from the surrounding rhetoric.",
+    stepTwo: "Pressure-test the logic",
+    stepTwoDetail: "Spot possible gaps and fallacies without mistaking AI output for a verdict.",
+    stepThree: "Respond with purpose",
+    stepThreeDetail: "Get practical reply approaches you can edit in your own voice.",
+    caveat: "AI analysis can be wrong. Check the original context and evidence before using a suggested reply.",
+    workspaceLabel: "Analysis workspace",
+    workspaceHint: "Start with a real argument or try the sample below.",
+    outputLabel: "What you’ll get",
+    emptyState: "Your analysis will appear here after you submit an argument.",
+    conversationLabel: "Your analysis",
+    entries: "entries",
+    error: "Analysis is unavailable right now. Your text is still in the editor—please try again.",
+    sampleButton: "Use an example",
+    sampleArgument: "We should ban all remote work because one teammate missed a deadline.",
+  },
   hero: {
     title: "Debate Buddy",
     subtitle: "AI-Powered Argument Analysis Tool",
@@ -32,7 +54,7 @@ export const en = {
   analysis: {
     extractedPoints: "Core Points",
     fallaciesDetected: "Logical Fallacies",
-    noFallacies: "No fallacies detected - argument appears logically sound",
+    noFallacies: "No obvious fallacies flagged by the model",
     rebuttalStrategies: "Rebuttal Strategies"
   },
   severity: {

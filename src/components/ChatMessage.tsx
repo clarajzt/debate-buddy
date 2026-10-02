@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { AlertTriangle, CheckCircle, Lightbulb, User } from "lucide-react";
+import { AlertTriangle, CheckCircle, Lightbulb, User, BrainCircuit } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/translations";
 import type { AnalysisData } from "@/pages/Index";
@@ -9,20 +9,21 @@ interface ChatMessageProps {
   role: "user" | "assistant";
   content: string;
   analysis?: AnalysisData;
+  error?: boolean;
 }
 
-export const ChatMessage = ({ role, content, analysis }: ChatMessageProps) => {
+export const ChatMessage = ({ role, content, analysis, error }: ChatMessageProps) => {
   const { language } = useLanguage();
   const t = translations[language];
 
   if (role === "user") {
     return (
-      <div className="flex gap-3 justify-end">
-        <Card className="max-w-[80%] bg-primary/10">
+      <div className="flex justify-end">
+        <Card className="max-w-[92%] rounded-2xl border-primary/10 bg-primary/5 shadow-none">
           <CardContent className="p-4">
-            <div className="flex items-start gap-2">
-              <p className="text-sm">{content}</p>
-              <User className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+            <div className="flex items-start gap-3">
+              <p className="whitespace-pre-wrap break-words text-sm leading-6">{content}</p>
+              <User className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" aria-hidden="true" />
             </div>
           </CardContent>
         </Card>
@@ -32,8 +33,12 @@ export const ChatMessage = ({ role, content, analysis }: ChatMessageProps) => {
 
   return (
     <div className="flex gap-3">
-      <Card className="w-full bg-card">
-        <CardContent className="p-4 space-y-4">
+      <div className="mt-1 hidden h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground sm:flex">
+        <BrainCircuit className="h-4 w-4" aria-hidden="true" />
+      </div>
+      <Card className={`w-full rounded-2xl shadow-none ${error ? "border-destructive/30 bg-destructive/5" : "border-border bg-background/50"}`}>
+        <CardContent className="space-y-5 p-5">
+          {error && <p role="alert" className="text-sm leading-6 text-destructive">{content}</p>}
           {analysis && (
             <>
               {/* Extracted Points */}
@@ -43,7 +48,7 @@ export const ChatMessage = ({ role, content, analysis }: ChatMessageProps) => {
                     <Lightbulb className="h-4 w-4 text-accent" />
                     {t.analysis.extractedPoints}
                   </h4>
-                  <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+                  <ul className="list-disc list-inside space-y-1 text-sm leading-6 text-muted-foreground">
                     {analysis.extractedPoints.map((point, idx) => (
                       <li key={idx}>{point}</li>
                     ))}

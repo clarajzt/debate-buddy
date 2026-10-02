@@ -25,7 +25,7 @@ const getSeverityColor = (severity: "high" | "medium" | "low") => {
     case "high":
       return "destructive";
     case "medium":
-      return "warning";
+      return "secondary";
     case "low":
       return "secondary";
   }
@@ -42,7 +42,7 @@ export const FallacyCard = ({ fallacy }: FallacyCardProps) => {
           <CardTitle className="text-base font-semibold">{fallacy.name}</CardTitle>
           <div className="flex items-center gap-2">
             {getSeverityIcon(fallacy.severity)}
-            <Badge variant={getSeverityColor(fallacy.severity) as any} className="text-xs">
+            <Badge variant={getSeverityColor(fallacy.severity)} className="text-xs">
               {t.fallacy.severity[fallacy.severity]}
             </Badge>
           </div>

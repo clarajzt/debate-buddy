@@ -1,14 +1,13 @@
 import { useState } from "react";
+import { ArrowRight, FileText, Loader2, MessageSquareText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent } from "@/components/ui/card";
-import { Send, Loader2, FileText, MessageSquare } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { translations } from "@/translations";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 interface ArgumentInputProps {
-  onAnalyze: (argument: string, context?: string, userReply?: string) => void;
+  onAnalyze: (argument: string, context?: string, userReply?: string) => Promise<boolean>;
   isAnalyzing: boolean;
 }
 
@@ -20,102 +19,97 @@ export const ArgumentInput = ({ onAnalyze, isAnalyzing }: ArgumentInputProps) =>
   const [userReply, setUserReply] = useState("");
   const [showContext, setShowContext] = useState(false);
 
-  const handleSubmit = () => {
-    if (argument.trim()) {
-      onAnalyze(argument.trim(), context.trim() || undefined, userReply.trim() || undefined);
+  const handleSubmit = async () => {
+    if (!argument.trim() || isAnalyzing) return;
+    const succeeded = await onAnalyze(argument.trim(), context.trim() || undefined, userReply.trim() || undefined);
+    if (succeeded) {
       setArgument("");
       setUserReply("");
     }
   };
 
   return (
-    <Card className="w-full shadow-elegant">
-      <CardContent className="p-3 space-y-2">
-        {/* Context Section - Collapsible */}
-        <Collapsible open={showContext} onOpenChange={setShowContext}>
-          <CollapsibleTrigger asChild>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="w-full justify-start text-muted-foreground hover:text-foreground"
-            >
-              <FileText className="h-4 w-4 mr-2" />
-              {t.input.addContext}
-            </Button>
-          </CollapsibleTrigger>
-          <CollapsibleContent className="space-y-2 pt-2">
-            <div className="space-y-2">
-              <label className="text-sm font-medium flex items-center gap-2">
-                <FileText className="h-3.5 w-3.5" />
-                {t.input.contextLabel}
-              </label>
-              <Textarea
-                placeholder={t.input.contextPlaceholder}
-                value={context}
-                onChange={(e) => setContext(e.target.value)}
-                className="min-h-[50px] resize-none text-sm"
-                disabled={isAnalyzing}
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium flex items-center gap-2">
-                <MessageSquare className="h-3.5 w-3.5" />
-                {t.input.userReplyLabel}
-              </label>
-              <Textarea
-                placeholder={t.input.userReplyPlaceholder}
-                value={userReply}
-                onChange={(e) => setUserReply(e.target.value)}
-                className="min-h-[50px] resize-none text-sm"
-                disabled={isAnalyzing}
-              />
-            </div>
-          </CollapsibleContent>
-        </Collapsible>
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <label htmlFor="argument" className="text-sm font-semibold">{t.input.argumentLabel}</label>
+        <button
+          type="button"
+          onClick={() => setArgument(t.workspace.sampleArgument)}
+          disabled={isAnalyzing}
+          className="rounded-full bg-secondary px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-accent/50 disabled:opacity-50"
+        >
+          {t.workspace.sampleButton} <span aria-hidden="true">↗</span>
+        </button>
+      </div>
+      <Textarea
+        id="argument"
+        placeholder={t.input.placeholder}
+        value={argument}
+        onChange={(event) => setArgument(event.target.value)}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
+            event.preventDefault();
+            void handleSubmit();
+          }
+        }}
+        maxLength={5000}
+        className="min-h-[160px] resize-y rounded-xl border-input bg-background/70 p-4 text-base leading-6 focus-visible:ring-primary"
+        disabled={isAnalyzing}
+      />
 
-        {/* Main Argument Input */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium">{t.input.argumentLabel}</label>
-          <Textarea
-            placeholder={t.input.placeholder}
-            value={argument}
-            onChange={(e) => setArgument(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey && !showContext) {
-                e.preventDefault();
-                handleSubmit();
-              }
-            }}
-            className="min-h-[60px] resize-none"
-            disabled={isAnalyzing}
-          />
-        </div>
-        
-        <div className="flex justify-between items-center">
-          <span className="text-sm text-muted-foreground">
-            {argument.length}/5000 {t.input.charLimit}
-          </span>
-          
-          <Button 
-            onClick={handleSubmit}
-            disabled={!argument.trim() || isAnalyzing}
-            className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"
-          >
-            {isAnalyzing ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                {t.input.analyzing}
-              </>
-            ) : (
-              <>
-                <Send className="h-4 w-4 mr-2" />
-                {t.input.analyzeButton}
-              </>
-            )}
+      <Collapsible open={showContext} onOpenChange={setShowContext}>
+        <CollapsibleTrigger asChild>
+          <Button variant="ghost" size="sm" className="h-auto px-0 text-primary hover:bg-transparent hover:text-primary/80">
+            <FileText className="mr-2 h-4 w-4" aria-hidden="true" />
+            {t.input.addContext}
           </Button>
-        </div>
-      </CardContent>
-    </Card>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="grid gap-4 pt-3">
+          <div className="space-y-2">
+            <label htmlFor="context" className="flex items-center gap-2 text-sm font-medium">
+              <FileText className="h-3.5 w-3.5" aria-hidden="true" />
+              {t.input.contextLabel}
+            </label>
+            <Textarea
+              id="context"
+              placeholder={t.input.contextPlaceholder}
+              value={context}
+              onChange={(event) => setContext(event.target.value)}
+              className="min-h-[72px] bg-background/70"
+              disabled={isAnalyzing}
+            />
+          </div>
+          <div className="space-y-2">
+            <label htmlFor="reply" className="flex items-center gap-2 text-sm font-medium">
+              <MessageSquareText className="h-3.5 w-3.5" aria-hidden="true" />
+              {t.input.userReplyLabel}
+            </label>
+            <Textarea
+              id="reply"
+              placeholder={t.input.userReplyPlaceholder}
+              value={userReply}
+              onChange={(event) => setUserReply(event.target.value)}
+              className="min-h-[72px] bg-background/70"
+              disabled={isAnalyzing}
+            />
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
+
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
+        <span className="text-xs text-muted-foreground">{argument.length}/5000 {t.input.charLimit}</span>
+        <Button
+          onClick={() => void handleSubmit()}
+          disabled={!argument.trim() || isAnalyzing}
+          className="h-11 rounded-xl bg-primary px-5 font-semibold text-primary-foreground hover:bg-primary/90"
+        >
+          {isAnalyzing ? (
+            <><Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />{t.input.analyzing}</>
+          ) : (
+            <>{t.input.analyzeButton}<ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" /></>
+          )}
+        </Button>
+      </div>
+    </div>
   );
 };

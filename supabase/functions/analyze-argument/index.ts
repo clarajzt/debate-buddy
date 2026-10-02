@@ -31,6 +31,11 @@ interface AnalysisData {
   overallAnalysis: string;
 }
 
+interface ConversationEntry {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -38,17 +43,27 @@ serve(async (req) => {
   }
 
   try {
-    const { argument, conversationHistory = [], context, userReply } = await req.json();
+    const payload = await req.json();
+    const { argument, context, userReply } = payload;
+    const conversationHistory: ConversationEntry[] = Array.isArray(payload.conversationHistory)
+      ? payload.conversationHistory
+          .filter((entry: unknown): entry is ConversationEntry =>
+            typeof entry === 'object' && entry !== null &&
+            'content' in entry && typeof entry.content === 'string' &&
+            'role' in entry && (entry.role === 'user' || entry.role === 'assistant'))
+          .slice(-12)
+      : [];
 
-    if (!argument) {
+    if (typeof argument !== 'string' || !argument.trim() || argument.length > 5000) {
       return new Response(
-        JSON.stringify({ error: 'Argument text is required' }),
+        JSON.stringify({ error: 'Argument text must be between 1 and 5000 characters' }),
         { 
           status: 400, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         }
       );
     }
+    if (!qwenApiKey) throw new Error('Analysis service is not configured');
 
     // Detect language based on the presence of Chinese characters
     const hasChinese = /[\u4e00-\u9fff]/.test(argument);
@@ -70,7 +85,7 @@ serve(async (req) => {
       // Ongoing conversation - provide contextual analysis
       prompt = `You are analyzing an ongoing debate conversation. Here is the conversation history:
 
-${conversationHistory.slice(0, -1).map((msg: any, idx: number) => 
+${conversationHistory.slice(0, -1).map((msg: ConversationEntry, idx: number) =>
   `${idx + 1}. ${msg.role === 'user' ? 'User' : 'Analysis'}: ${msg.content}`
 ).join('\n')}
 ${contextInfo}
@@ -132,7 +147,7 @@ Provide 2-3 rebuttal strategies with specific, usable templates. Make the analys
 
     // Add conversation context if it exists
     if (conversationHistory.length > 1) {
-      conversationHistory.slice(0, -1).forEach((msg: any) => {
+      conversationHistory.slice(0, -1).forEach((msg: ConversationEntry) => {
         messages.push({
           role: msg.role === 'user' ? 'user' : 'assistant',
           content: msg.content
@@ -163,13 +178,10 @@ Provide 2-3 rebuttal strategies with specific, usable templates. Make the analys
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Qwen API error:', errorText);
       throw new Error(`Qwen API error: ${response.status}`);
     }
 
     const data = await response.json();
-    console.log('Qwen API response:', data);
 
     let analysisResult: AnalysisData;
     
@@ -188,26 +200,7 @@ Provide 2-3 rebuttal strategies with specific, usable templates. Make the analys
       }
     } catch (parseError) {
       console.error('Failed to parse Qwen response:', parseError);
-      
-      // Fallback to a structured response if parsing fails
-      analysisResult = {
-        extractedPoints: [
-          "Unable to parse argument automatically",
-          "Please try rephrasing your argument",
-          "Manual analysis may be required"
-        ],
-        fallacies: [],
-        rebuttalStrategies: [
-          {
-            id: "1",
-            title: "Request Clarification",
-            approach: "Ask for more specific information",
-            template: "Could you please clarify what you mean by [specific point]? I want to make sure I understand your argument correctly.",
-            effectiveness: 70
-          }
-        ],
-        overallAnalysis: "The argument structure was not clear enough for automated analysis. Consider breaking it down into more specific points."
-      };
+      throw new Error('Analysis response could not be parsed');
     }
 
     return new Response(JSON.stringify(analysisResult), {
@@ -218,8 +211,7 @@ Provide 2-3 rebuttal strategies with specific, usable templates. Make the analys
     console.error('Error in analyze-argument function:', error);
     return new Response(
       JSON.stringify({ 
-        error: 'Analysis failed',
-        message: error.message 
+        error: 'Analysis failed'
       }),
       {
         status: 500,

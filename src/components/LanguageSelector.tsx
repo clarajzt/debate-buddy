@@ -14,7 +14,7 @@ export const LanguageSelector = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon">
+        <Button variant="outline" size="icon" aria-label={language === 'zh' ? '切换语言' : 'Change language'} className="rounded-xl bg-card">
           <Globe className="h-5 w-5" />
         </Button>
       </DropdownMenuTrigger>
